@@ -213,28 +213,3 @@ target_link_libraries(graphical_practice PRIVATE
     user32
 )
 ```
-
-3) CLion
-- Abra o diretório do projeto no CLion.
-- Configure o Toolchain (MinGW/MSYS2 conforme seu setup).
-- Build e Run o target `graphical_practice`.
-
----
-
-### Próximas Extensões (Sugeridas)
-- Texturas e Materiais:
-    - Carregar texturas (stb_image) e desenhar quads texturizados para pista/grama/decoração.
-- Geometria de Pista:
-    - Curvas com polilinhas e máscaras de colisão por segmentos (em vez de retângulo global).
-- Colisão e Física:
-    - Melhorar modelo de atrito lateral/derrapagem, limites com paredes, cones como círculos sólidos/fill.
-- UI/HUD:
-    - Refinar tipografia, adicionar contador de checkpoints restantes, mini‑map.
-- Portabilidade para 3D:
-    - Substituir `GlRenderer2D` por renderer 3D, extrudar formas e usar câmera isométrica/perspectiva mantendo o domínio intacto.
-
----
-
-### Créditos e Licença
-- Uso acadêmico para a disciplina de Computação Gráfica.
-- Bibliotecas e assets visuais devem respeitar suas licenças específicas (ex.: FreeGLUT, stb_image, texturas).
