@@ -1,0 +1,8 @@
+//
+// Created by joaop on 10/26/2025.
+//
+
+#ifndef RACE_PRACTICE_LAPETIMER_H
+#define RACE_PRACTICE_LAPETIMER_H
+
+#endif //RACE_PRACTICE_LAPETIMER_H
