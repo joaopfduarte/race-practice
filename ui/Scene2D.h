@@ -35,7 +35,10 @@ public:
 
 private:
     // Geometria básica da pista (retangular para colisão simples)
-    float trackX_ = 100.0f, trackY_ = 80.0f, trackW_ = 524.0f, trackH_ = 658.0f;
+    float trackX_ = 250.0f;
+    float trackY_ = 55.0f;
+    float trackW_ = 524.0f;
+    float trackH_ = 658.0f;
 
     // Linha de largada (segmento vertical)
     float startLineX1_ = 512.0f, startLineY1_ = 80.0f;

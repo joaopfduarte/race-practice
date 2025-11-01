@@ -44,7 +44,6 @@ void GlWindow::init(int argc, char** argv, int w, int h, const char* title){
 
     glEnable(GL_TEXTURE_2D);
 
-    // Verificar se o contexto está OK
     const GLubyte* version = glGetString(GL_VERSION);
     std::fprintf(stderr, "[GlWindow] OpenGL Version: %s\n", version);
 
