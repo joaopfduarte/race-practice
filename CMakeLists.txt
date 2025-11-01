@@ -28,16 +28,17 @@ add_executable(race_practice main.cpp
         domain/car/LapeTimer.h
         domain/track/Track.cpp
         domain/track/Track.h
-        infrastructure/GIWindow.cpp
-        infrastructure/GIWindow.h
-        infrastructure/GIRenderer2D.cpp
-        infrastructure/GIRenderer2D.h
+        infrastructure/GlWindow.cpp
+        infrastructure/GlWindow.h
+        infrastructure/GlRenderer2D.cpp
+        infrastructure/GlRenderer2D.h
         infrastructure/Texture.cpp
         infrastructure/Texture.h
         ui/Scene2D.cpp
         ui/Scene2D.h
         ui/Hud.cpp
         ui/Hud.h
+        third_party/stb_image.h
 )
 
 target_include_directories(race_practice PRIVATE src)
@@ -50,4 +51,10 @@ target_link_libraries(race_practice PRIVATE
         winmm
         gdi32
         user32
+)
+
+add_custom_command(TARGET race_practice POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/assets
+        $<TARGET_FILE_DIR:race_practice>/assets
 )

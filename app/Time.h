@@ -4,5 +4,9 @@
 
 #ifndef RACE_PRACTICE_TIME_H
 #define RACE_PRACTICE_TIME_H
+#pragma once
+struct Time {
+    static double nowMs();
+};
 
 #endif //RACE_PRACTICE_TIME_H

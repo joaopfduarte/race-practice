@@ -3,3 +3,8 @@
 //
 
 #include "Time.h"
+#include <GL/glut.h>
+
+double Time::nowMs() {
+    return (double)glutGet(GLUT_ELAPSED_TIME);
+}
