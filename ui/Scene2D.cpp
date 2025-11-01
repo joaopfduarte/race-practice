@@ -5,21 +5,9 @@
 #include <cstdio>
 
 Scene2D::Scene2D() : pistaTex_() {
-    // Valores padrão já inicializados nos membros
 }
 
 bool Scene2D::init() {
-    // Tenta carregar a textura usando caminho padrão
-    if (!pistaTex_.loadFromFile(pistaPath_)) {
-        // Fallback quando o executável roda a partir de cmake-build-*/
-        std::string alt = "../" + pistaPath_;
-        if (!pistaTex_.loadFromFile(alt)) {
-            std::fprintf(stderr, "[Scene2D] Falha ao carregar textura da pista: %s ou %s\n",
-                         pistaPath_.c_str(), alt.c_str());
-            // Continua sem textura (fallback visual será retângulo cinza)
-            return false;
-        }
-    }
     return true;
 }
 
@@ -32,19 +20,17 @@ void Scene2D::reset() {
 
     currentLapTime_ = 0.0;
     failures_ = 0;
-    // Não zera bestLapTime_ nem laps_ aqui (ajuste conforme regra desejada).
-    // Se quiser zerar voltas no reset: laps_ = 0; bestLapTime_ = 0.0;
 }
 
-void Scene2D::update(double dt, const CarInputState& in) {
+void Scene2D::update(double dt, const CarInputState &in) {
     // Física simples
     const float accel = 500.0f;
     const float brake = 600.0f;
-    const float drag  = 0.98f;
+    const float drag = 0.98f;
     const float maxSpeed = 600.0f;
     const float steer = 2.5f; // rad/s
 
-    if (in.left)  car_.angle += steer * dt;
+    if (in.left) car_.angle += steer * dt;
     if (in.right) car_.angle -= steer * dt;
 
     float forward = 0.0f;
@@ -85,14 +71,11 @@ void Scene2D::update(double dt, const CarInputState& in) {
     // TODO (futuro): colisão com buracos e failures_++
 }
 
-void Scene2D::draw(GlRenderer2D& r) {
+void Scene2D::draw(GlRenderer2D &r) {
+    // Carrega textura apenas no primeiro frame
+
     // 1) Pista como textura de fundo dentro da caixa (trackX/Y/W/H)
-    if (pistaTex_.id() != 0) {
-        r.drawTexturedQuad(trackX_, trackY_, trackW_, trackH_, pistaTex_.id());
-    } else {
-        // Fallback: retângulo cinza se textura indisponível
-        r.drawFilledRect(trackX_, trackY_, trackW_, trackH_, 0.12f, 0.12f, 0.12f);
-    }
+    r.drawFilledRect(trackX_, trackY_, trackW_, trackH_, 0.12f, 0.12f, 0.12f);
 
     // 2) Bordas da pista (opcional para reforço visual)
     r.drawLine(trackX_, trackY_, trackX_ + trackW_, trackY_, 1, 1, 1, 2);
@@ -109,8 +92,8 @@ void Scene2D::draw(GlRenderer2D& r) {
     float L = 18.0f, W = 12.0f;
 
     // Vértices no espaço local (triângulo: ponta à frente)
-    float px1 =  L, py1 =  0;
-    float px2 = -L, py2 =  W;
+    float px1 = L, py1 = 0;
+    float px2 = -L, py2 = W;
     float px3 = -L, py3 = -W;
 
     auto rot = [&](float px, float py) {

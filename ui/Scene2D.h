@@ -29,15 +29,13 @@ public:
 
     double currentLapTime() const { return currentLapTime_; }
 
-    double bestLapTime() const { return bestLapTime_; }
-
     float speed() const { return car_.speed; }
 
     int failures() const { return failures_; }
 
 private:
     // Geometria básica da pista (retangular para colisão simples)
-    float trackX_ = 100.0f, trackY_ = 80.0f, trackW_ = 824.0f, trackH_ = 608.0f;
+    float trackX_ = 100.0f, trackY_ = 80.0f, trackW_ = 524.0f, trackH_ = 658.0f;
 
     // Linha de largada (segmento vertical)
     float startLineX1_ = 512.0f, startLineY1_ = 80.0f;
@@ -50,6 +48,7 @@ private:
     Texture pistaTex_;
     // Caminho padrão (assumindo execução a partir da raiz do projeto)
     std::string pistaPath_ = "assets/textures/pista.png";
+    bool textureLoaded_ = false;
 
     // Estado do carro e métricas
     CarState car_;

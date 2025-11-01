@@ -3,6 +3,8 @@
 //
 
 #include "GlWindow.h"
+
+#include <cstdio>
 #include <GL/glut.h>
 
 static std::function<void()> g_display, g_idle;
@@ -39,6 +41,17 @@ void GlWindow::init(int argc, char** argv, int w, int h, const char* title){
     glutSpecialUpFunc(sSpUp);
 
     glClearColor(0.1f,0.1f,0.12f,1.0f);
+
+    glEnable(GL_TEXTURE_2D);
+
+    // Verificar se o contexto está OK
+    const GLubyte* version = glGetString(GL_VERSION);
+    std::fprintf(stderr, "[GlWindow] OpenGL Version: %s\n", version);
+
+    GLenum err = glGetError();
+    if (err != GL_NO_ERROR) {
+        std::fprintf(stderr, "[GlWindow] OpenGL error after init: 0x%x\n", err);
+    }
 }
 
 void GlWindow::runLoop(){ glutMainLoop(); }

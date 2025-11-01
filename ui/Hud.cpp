@@ -12,7 +12,6 @@ void Hud::draw(GlRenderer2D& r, const Scene2D& s){
     std::snprintf(buf, sizeof(buf), "Voltas: %d/%d", s.laps(), s.lapTarget());
     r.drawText(20, r.viewportHeight()-28, buf, 1,1,0);
 
-    std::snprintf(buf, sizeof(buf), "Volta atual: %.2fs  | Melhor: %.2fs", s.currentLapTime(), s.bestLapTime());
     r.drawText(20, r.viewportHeight()-46, buf, 1,1,1);
 
     std::snprintf(buf, sizeof(buf), "Velocidade: %.1f", s.speed());
