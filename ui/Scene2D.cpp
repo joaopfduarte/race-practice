@@ -72,19 +72,35 @@ void Scene2D::update(double dt, const CarInputState &in) {
 }
 
 void Scene2D::draw(GlRenderer2D &r) {
-    // Carrega textura apenas no primeiro frame
-
-    // 1) Pista como textura de fundo dentro da caixa (trackX/Y/W/H)
     r.drawFilledRect(trackX_, trackY_, trackW_, trackH_, 0.12f, 0.12f, 0.12f);
 
-    // 2) Bordas da pista (opcional para reforço visual)
     r.drawLine(trackX_, trackY_, trackX_ + trackW_, trackY_, 1, 1, 1, 2);
     r.drawLine(trackX_, trackY_ + trackH_, trackX_ + trackW_, trackY_ + trackH_, 1, 1, 1, 2);
     r.drawLine(trackX_, trackY_, trackX_, trackY_ + trackH_, 1, 1, 1, 2);
     r.drawLine(trackX_ + trackW_, trackY_, trackX_ + trackW_, trackY_ + trackH_, 1, 1, 1, 2);
 
-    // 3) Linha de largada/chegada (sobre a textura)
-    r.drawLine(startLineX1_, startLineY1_, startLineX2_, startLineY2_, 1, 0, 0, 3);
+    {
+        float centerX = startLineX1_;
+        float dashLen = 28.0f;   // comprimento do traço
+        float gapLen  = 18.0f;   // espaçamento entre traços
+        float period  = dashLen + gapLen;
+        float thickness = 6.0f;
+
+        // fator de deslocamento
+        float scrollFactor = -0.6f;
+        float phase = std::fmod(-car_.y * scrollFactor, period);
+        if (phase < 0.0f) phase += period;
+
+        float yStart = trackY_ - phase;
+        float yLimit = trackY_ + trackH_;
+        for (float y = yStart; y < yLimit; y += period) {
+            float segStart = std::max(y, trackY_);
+            float segEnd   = std::min(y + dashLen, yLimit);
+            if (segEnd > segStart) {
+                r.drawLine(centerX, segStart, centerX, segEnd, 1.0f, 1.0f, 0.0f, thickness);
+            }
+        }
+    }
 
     // 4) Carro como triângulo orientado pelo ângulo
     float bx = car_.x, by = car_.y;
