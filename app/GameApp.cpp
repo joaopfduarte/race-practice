@@ -49,7 +49,7 @@ void GameApp::onDisplay() {
 
 void GameApp::onIdle() {
     double now = Time::nowMs();
-    double dt = (now - lastTimeMs_) / 700.0;
+    double dt = (now - lastTimeMs_) / 500.0;
     lastTimeMs_ = now;
 
     if (!paused_ && !quit_) {

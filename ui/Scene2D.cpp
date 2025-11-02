@@ -145,8 +145,8 @@ void Scene2D::update(double dt, const CarInputState &in) {
         }
         if (collided) {
             failures_++;
-            // Encerra se bater 3x
-            if (failures_ == 3) {
+            // Encerra se bater 5x
+            if (failures_ == 5) {
                 exit(0);
             }
             flashTimeRemaining_ = 0.25f;
