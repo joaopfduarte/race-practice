@@ -23,10 +23,6 @@ public:
 
     void reset();
 
-    int laps() const { return laps_; }
-
-    int lapTarget() const { return lapTarget_; }
-
     double currentLapTime() const { return currentLapTime_; }
 
     float speed() const { return car_.speed; }
