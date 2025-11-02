@@ -57,7 +57,7 @@ private:
     // Textura da pista
     Texture pistaTex_;
     // Caminho padrão (assumindo execução a partir da raiz do projeto)
-    std::string pistaPath_ = "assets/textures/pista.png";
+    std::string pistaPath_ = "assets/asfalto.png";
     bool textureLoaded_ = false;
 
     // Estado do carro e métricas

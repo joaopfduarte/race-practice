@@ -14,6 +14,9 @@ bool Scene2D::init() {
     obstacles_.clear();
     spawnCooldown_ = 0.5f;
     flashTimeRemaining_ = 0.0f;
+
+    textureLoaded_ = pistaTex_.loadFromFile(pistaPath_, true);
+
     return true;
 }
 
@@ -169,7 +172,11 @@ void Scene2D::update(double dt, const CarInputState &in) {
 }
 
 void Scene2D::draw(GlRenderer2D &r) {
-    r.drawFilledRect(trackX_, trackY_, trackW_, trackH_, 0.12f, 0.12f, 0.12f);
+    if (textureLoaded_ && pistaTex_.id() != 0) {
+        r.drawTexturedQuad(trackX_, trackY_, trackW_, trackH_, pistaTex_.id());
+    } else {
+        r.drawFilledRect(trackX_, trackY_, trackW_, trackH_, 0.12f, 0.12f, 0.12f);
+    }
 
     r.drawLine(trackX_, trackY_, trackX_ + trackW_, trackY_, 1, 1, 1, 2);
     r.drawLine(trackX_, trackY_ + trackH_, trackX_ + trackW_, trackY_ + trackH_, 1, 1, 1, 2);
