@@ -3,11 +3,17 @@
 #include <cmath>
 #include <algorithm>
 #include <cstdio>
+#include <cstdlib>
+#include <ctime>
 
 Scene2D::Scene2D() : pistaTex_() {
 }
 
 bool Scene2D::init() {
+    std::srand(static_cast<unsigned>(std::time(nullptr)));
+    obstacles_.clear();
+    spawnCooldown_ = 0.5f;
+    flashTimeRemaining_ = 0.0f;
     return true;
 }
 
@@ -20,6 +26,11 @@ void Scene2D::reset() {
 
     currentLapTime_ = 0.0;
     failures_ = 0;
+
+    // Reinicia novos estados
+    obstacles_.clear();
+    spawnCooldown_ = 0.5f;
+    flashTimeRemaining_ = 0.0f;
 }
 
 void Scene2D::update(double dt, const CarInputState &in) {
@@ -68,7 +79,89 @@ void Scene2D::update(double dt, const CarInputState &in) {
 
     currentLapTime_ += dt;
 
-    // TODO (futuro): colisão com buracos e failures_++
+    // Atualiza flash de colisão
+    if (flashTimeRemaining_ > 0.0f) {
+        flashTimeRemaining_ = std::max(0.0f, flashTimeRemaining_ - static_cast<float>(dt));
+    }
+
+    // Spawning de obstáculos
+    spawnCooldown_ -= static_cast<float>(dt);
+    if (spawnCooldown_ <= 0.0f) {
+        // parâmetros
+        float edgeMargin = 18.0f;
+        float centerX = trackX_ + trackW_ * 0.5f;
+        float centerY = trackY_ + trackH_ * 0.5f;
+        float speedPx = 160.0f;
+        float radius = 12.0f + static_cast<float>(std::rand() % 9);
+
+        // escolhe lado: 0=esquerda,1=direita,2=topo
+        int side = std::rand() % 3;
+        Obstacle o{};
+        if (side == 0) {
+            o.x = trackX_ - edgeMargin;
+            o.y = trackY_ + static_cast<float>(std::rand()) / RAND_MAX * trackH_;
+        } else if (side == 1) {
+            o.x = trackX_ + trackW_ + edgeMargin;
+            o.y = trackY_ + static_cast<float>(std::rand()) / RAND_MAX * trackH_;
+        } else {
+            o.x = trackX_ + static_cast<float>(std::rand()) / RAND_MAX * trackW_;
+            o.y = trackY_ + trackH_ + edgeMargin;
+        }
+        // direção para o centro
+        float dx = centerX - o.x;
+        float dy = centerY - o.y;
+        float len = std::sqrt(dx*dx + dy*dy);
+        if (len < 1.0f) { dx = 1.0f; dy = 0.0f; len = 1.0f; }
+        o.vx = dx / len * speedPx;
+        o.vy = dy / len * speedPx;
+        o.radius = radius;
+        o.ttl = 10.0f;
+        obstacles_.push_back(o);
+
+        // próximo spawn em 0.6..1.8s
+        float r01 = static_cast<float>(std::rand()) / RAND_MAX;
+        spawnCooldown_ = 0.6f + r01 * 1.2f;
+    }
+
+    // Atualiza obstáculos e detecta colisão via amostragem da borda a cada 15 graus
+    const float carCollisionRadius = 14.0f;
+    for (auto &o : obstacles_) {
+        o.x += o.vx * static_cast<float>(dt);
+        o.y += o.vy * static_cast<float>(dt);
+        o.ttl -= static_cast<float>(dt);
+
+        bool collided = false;
+        // 24 amostras (360 / 15)
+        for (int i = 0; i < 24; ++i) {
+            float t = (static_cast<float>(i) * 15.0f) * 3.1415926535f / 180.0f;
+            float px = o.x + std::cos(t) * o.radius;
+            float py = o.y + std::sin(t) * o.radius;
+            float dx = px - car_.x;
+            float dy = py - car_.y;
+            if (dx*dx + dy*dy <= carCollisionRadius * carCollisionRadius) {
+                collided = true;
+                break;
+            }
+        }
+        if (collided) {
+            failures_++;
+            flashTimeRemaining_ = 0.25f;
+            // marca TTL para remover já
+            o.ttl = 0.0f;
+        }
+    }
+
+    // remove obstáculos fora da pista
+    const float removeMargin = 24.0f;
+    obstacles_.erase(
+        std::remove_if(obstacles_.begin(), obstacles_.end(), [&](const Obstacle& o){
+            bool out = (o.x < trackX_ - removeMargin) || (o.x > trackX_ + trackW_ + removeMargin) ||
+                       (o.y < trackY_ - removeMargin) || (o.y > trackY_ + trackH_ + removeMargin) ||
+                       (o.ttl <= 0.0f);
+            return out;
+        }),
+        obstacles_.end()
+    );
 }
 
 void Scene2D::draw(GlRenderer2D &r) {
@@ -102,10 +195,16 @@ void Scene2D::draw(GlRenderer2D &r) {
         }
     }
 
-    // 4) Carro como triângulo orientado pelo ângulo
-    float bx = car_.x, by = car_.y;
-    float ang = car_.angle;
-    float L = 18.0f, W = 12.0f;
+    // 3.5) Desenha obstáculos
+    for (const auto& o : obstacles_) {
+        // cor laranja para visibilidade
+        r.drawCircle(o.x, o.y, o.radius, 1.0f, 0.6f, 0.0f, 24);
+    }
+ 
+     // 4) Carro como triângulo orientado pelo ângulo
+     float bx = car_.x, by = car_.y;
+     float ang = car_.angle;
+     float L = 18.0f, W = 12.0f;
 
     // Vértices no espaço local (triângulo: ponta à frente)
     float px1 = L, py1 = 0;
@@ -122,7 +221,12 @@ void Scene2D::draw(GlRenderer2D &r) {
     auto v2 = rot(px2, py2);
     auto v3 = rot(px3, py3);
 
-    r.drawLine(v1.first, v1.second, v2.first, v2.second, 0, 1, 0, 2);
-    r.drawLine(v2.first, v2.second, v3.first, v3.second, 0, 1, 0, 2);
-    r.drawLine(v3.first, v3.second, v1.first, v1.second, 0, 1, 0, 2);
+    // Cor do carro: vermelho durante flash de colisão, verde caso contrário
+    float carR = (flashTimeRemaining_ > 0.0f) ? 1.0f : 0.0f;
+    float carG = (flashTimeRemaining_ > 0.0f) ? 0.0f : 1.0f;
+    float carB = 0.0f;
+
+    r.drawLine(v1.first, v1.second, v2.first, v2.second, carR, carG, carB, 2);
+    r.drawLine(v2.first, v2.second, v3.first, v3.second, carR, carG, carB, 2);
+    r.drawLine(v3.first, v3.second, v1.first, v1.second, carR, carG, carB, 2);
 }

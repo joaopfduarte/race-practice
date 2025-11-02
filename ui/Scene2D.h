@@ -1,6 +1,8 @@
 #pragma once
-#include "../app/InputMapper.h"
+#include <string>
 #include "../infrastructure/Texture.h"
+#include "../app/InputMapper.h"
+#include <vector>
 
 class GlRenderer2D;
 
@@ -9,6 +11,15 @@ struct CarState {
     float y = 120.0f;
     float angle = 3.1415926f / 2.0f;
     float speed = 0.0f;
+};
+
+struct Obstacle {
+    float x;
+    float y;
+    float radius;
+    float vx;
+    float vy;
+    float ttl; // tempo de vida restante (s)
 };
 
 class Scene2D {
@@ -56,4 +67,11 @@ private:
     int failures_ = 0; // reservado para colisão com buracos (futuro)
     double currentLapTime_ = 0.0;
     double bestLapTime_ = 0.0;
+
+    // Obstáculos e spawn
+    std::vector<Obstacle> obstacles_;
+    float spawnCooldown_ = 0.0f;
+
+    // Feedback visual de colisão
+    float flashTimeRemaining_ = 0.0f;
 };
