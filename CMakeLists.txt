@@ -21,13 +21,9 @@ add_executable(race_practice main.cpp
         app/InputMapper.h
         app/Time.cpp
         app/Time.h
-        domain/types/MathTypes.cpp
-        domain/types/MathTypes.h
         domain/car/Physics.h
         domain/car/Car.h
         domain/car/LapeTimer.h
-        domain/track/Track.cpp
-        domain/track/Track.h
         infrastructure/GlWindow.cpp
         infrastructure/GlWindow.h
         infrastructure/GlRenderer2D.cpp
