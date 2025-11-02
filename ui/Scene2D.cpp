@@ -96,27 +96,27 @@ void Scene2D::update(double dt, const CarInputState &in) {
 
         // escolhe lado: 0=esquerda,1=direita,2=topo
         int side = std::rand() % 3;
-        Obstacle o{};
+        Obstacle obstacle{};
         if (side == 0) {
-            o.x = trackX_ - edgeMargin;
-            o.y = trackY_ + static_cast<float>(std::rand()) / RAND_MAX * trackH_;
+            obstacle.x = trackX_ - edgeMargin;
+            obstacle.y = trackY_ + static_cast<float>(std::rand()) / RAND_MAX * trackH_;
         } else if (side == 1) {
-            o.x = trackX_ + trackW_ + edgeMargin;
-            o.y = trackY_ + static_cast<float>(std::rand()) / RAND_MAX * trackH_;
+            obstacle.x = trackX_ + trackW_ + edgeMargin;
+            obstacle.y = trackY_ + static_cast<float>(std::rand()) / RAND_MAX * trackH_;
         } else {
-            o.x = trackX_ + static_cast<float>(std::rand()) / RAND_MAX * trackW_;
-            o.y = trackY_ + trackH_ + edgeMargin;
+            obstacle.x = trackX_ + static_cast<float>(std::rand()) / RAND_MAX * trackW_;
+            obstacle.y = trackY_ + trackH_ + edgeMargin;
         }
         // direção para o centro
-        float dx = centerX - o.x;
-        float dy = centerY - o.y;
+        float dx = centerX - obstacle.x;
+        float dy = centerY - obstacle.y;
         float len = std::sqrt(dx*dx + dy*dy);
         if (len < 1.0f) { dx = 1.0f; dy = 0.0f; len = 1.0f; }
-        o.vx = dx / len * speedPx;
-        o.vy = dy / len * speedPx;
-        o.radius = radius;
-        o.ttl = 10.0f;
-        obstacles_.push_back(o);
+        obstacle.vx = dx / len * speedPx;
+        obstacle.vy = dy / len * speedPx;
+        obstacle.radius = radius;
+        obstacle.ttl = 10.0f;
+        obstacles_.push_back(obstacle);
 
         // próximo spawn em 0.6..1.8s
         float r01 = static_cast<float>(std::rand()) / RAND_MAX;
@@ -145,6 +145,10 @@ void Scene2D::update(double dt, const CarInputState &in) {
         }
         if (collided) {
             failures_++;
+            // Encerra se bater 3x
+            if (failures_ == 3) {
+                exit(0);
+            }
             flashTimeRemaining_ = 0.25f;
             // marca TTL para remover já
             o.ttl = 0.0f;
