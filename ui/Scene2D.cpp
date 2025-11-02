@@ -69,18 +69,8 @@ void Scene2D::update(double dt, const CarInputState &in) {
     bool nearStartX = std::abs(car_.x - startLineX1_) < 10.0f;
     if (nearStartX) {
         bool nowPositive = car_.y > (startLineY2_);
-        if (!lastStartSidePositive_ && nowPositive && car_.speed > 50.0f) {
-            // Completou uma volta válida
-            laps_++;
-            if (bestLapTime_ <= 0.0 || currentLapTime_ < bestLapTime_) {
-                bestLapTime_ = currentLapTime_;
-            }
-            currentLapTime_ = 0.0;
-        }
         lastStartSidePositive_ = nowPositive;
     }
-
-    currentLapTime_ += dt;
 
     // Atualiza flash de colisão
     if (flashTimeRemaining_ > 0.0f) {
